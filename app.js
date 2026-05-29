@@ -62,8 +62,6 @@ const statPerfectDays = document.getElementById('stat-perfect-days');
 const settingsModal = document.getElementById('settings-modal');
 const settingsToggleBtn = document.getElementById('settings-toggle-btn');
 const settingsCloseBtn = document.getElementById('settings-close-btn');
-const clientIdInput = document.getElementById('google-client-id-input');
-const saveClientIdBtn = document.getElementById('save-client-id-btn');
 const tickVolumeSlider = document.getElementById('tick-volume-slider');
 const volumeValDisplay = document.getElementById('volume-val-display');
 
@@ -119,12 +117,6 @@ function loadData() {
     } catch (e) {
       console.error('Error loading data from localStorage', e);
     }
-  }
-  
-  // Load Client ID
-  const savedClientId = loadGoogleClientId();
-  if (savedClientId && clientIdInput) {
-    clientIdInput.value = savedClientId;
   }
   
   updateDashboard();
@@ -976,13 +968,6 @@ function setupEventListeners() {
     settingsModal.classList.add('hidden');
   });
   
-  // Save Client ID
-  saveClientIdBtn.addEventListener('click', () => {
-    const id = clientIdInput.value.trim();
-    saveGoogleClientId(id);
-    alert('Google Client ID updated! Please reload the page to authenticate.');
-    settingsModal.classList.add('hidden');
-  });
   
   // Volume Slider
   tickVolumeSlider.addEventListener('input', (e) => {

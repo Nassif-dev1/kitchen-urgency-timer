@@ -38,9 +38,8 @@
 
         <!-- Google Auth Section -->
         <div class="auth-section">
-          <button id="google-login-btn" class="btn btn-secondary btn-auth">
-            <i class="fa-brands fa-google"></i> Sign In with Google
-          </button>
+          <!-- Google renders its official button here -->
+          <div id="g-signin-btn"></div>
           <div id="user-profile" class="user-profile hidden">
             <img id="user-avatar" src="" alt="Profile" class="avatar">
             <span id="user-name" class="username">User</span>
@@ -210,30 +209,6 @@
         <button id="settings-close-btn" class="btn btn-icon btn-glass-small"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="modal-body">
-        <!-- Google API Settings -->
-        <div class="settings-group">
-          <label class="settings-label">
-            <span>Google API Client ID</span>
-            <span class="help-text">Required for cloud synchronization.</span>
-          </label>
-          <div class="input-with-button">
-            <input type="text" id="google-client-id-input" placeholder="Enter Google Client ID here..." class="form-input">
-            <button id="save-client-id-btn" class="btn btn-secondary">Save</button>
-          </div>
-          <div class="help-instructions">
-            <details>
-              <summary>How to get a Client ID?</summary>
-              <ol>
-                <li>Go to the <a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud Console</a>.</li>
-                <li>Create a project, then go to <strong>APIs & Services > Credentials</strong>.</li>
-                <li>Configure the OAuth consent screen. Add the scope `.../auth/drive.appdata`.</li>
-                <li>Create an <strong>OAuth client ID</strong> (Application type: Web application).</li>
-                <li>Add authorized JavaScript origins: `http://localhost:5173` or `http://127.0.0.1:5173` (depending on your Vite port).</li>
-                <li>Copy the Client ID and paste it here.</li>
-              </ol>
-            </details>
-          </div>
-        </div>
 
         <!-- Audio Volume -->
         <div class="settings-group">
