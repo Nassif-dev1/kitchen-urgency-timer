@@ -1,0 +1,14 @@
+{
+  "name": "kitchen-urgency-timer",
+  "version": "1.0.0",
+  "description": "A 4-hour kitchen-style urgency timer with Google Drive syncing and calendar rewards.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0"
+  }
+}

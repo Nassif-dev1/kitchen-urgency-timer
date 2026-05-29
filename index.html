@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuraTimer - 4H Focus Block & Daily Tracker</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Google GIS SDK -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="dark-theme">
+  <!-- Celebration Canvas (Overlay) -->
+  <canvas id="celebration-canvas"></canvas>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-icon-wrapper">
+          <i class="fa-solid fa-hourglass-half logo-icon animate-pulse"></i>
+        </div>
+        <span class="logo-text">Aura<span class="highlight">Timer</span></span>
+      </div>
+      
+      <div class="header-controls">
+        <!-- Sync Status Indicator -->
+        <div id="sync-status" class="sync-indicator offline" title="Not connected to Google Cloud">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span class="sync-text">Local Only</span>
+        </div>
+
+        <!-- Google Auth Section -->
+        <div class="auth-section">
+          <button id="google-login-btn" class="btn btn-secondary btn-auth">
+            <i class="fa-brands fa-google"></i> Sign In with Google
+          </button>
+          <div id="user-profile" class="user-profile hidden">
+            <img id="user-avatar" src="" alt="Profile" class="avatar">
+            <span id="user-name" class="username">User</span>
+            <button id="google-logout-btn" class="btn btn-icon" title="Sign Out">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Settings Trigger -->
+        <button id="settings-toggle-btn" class="btn btn-icon btn-glass" title="Settings">
+          <i class="fa-solid fa-sliders"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Layout -->
+    <main class="main-content">
+      <!-- Left Column: The Timer Dial -->
+      <section class="timer-section glass-panel">
+        <div class="timer-card-header">
+          <h2>4-Hour Focus Block</h2>
+          <p class="subtitle">Log deep work. Complete 3 daily targets.</p>
+        </div>
+
+        <!-- The Dial Container -->
+        <div class="dial-container">
+          <!-- Ambient Urgency Pulse Background Glow -->
+          <div class="ambient-glow" id="ambient-glow"></div>
+          
+          <!-- Outer circular track and ticking ring -->
+          <div class="timer-ring-outer">
+            <!-- SVG Progress Ring -->
+            <svg class="progress-ring-svg" width="320" height="320">
+              <circle class="progress-ring-track" cx="160" cy="160" r="145" />
+              <circle id="progress-ring-bar" class="progress-ring-bar" cx="160" cy="160" r="145" />
+            </svg>
+
+            <!-- Brushed Metal Rotary Dial -->
+            <div class="rotary-dial" id="rotary-dial">
+              <!-- Dial tick marks (generated dynamically or styled) -->
+              <div class="dial-ticks"></div>
+              
+              <!-- Red marker line / dial hand -->
+              <div class="dial-pointer-line" id="dial-pointer-line"></div>
+              
+              <!-- Inner center cap -->
+              <div class="dial-center-cap">
+                <!-- Large Digital Display inside Center -->
+                <div class="digital-display">
+                  <div class="time-left" id="time-display">04:00:00</div>
+                  <div class="time-label" id="timer-state-label">READY</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timer Control Buttons -->
+        <div class="timer-controls">
+          <button id="timer-start-btn" class="btn btn-primary btn-large">
+            <i class="fa-solid fa-play"></i> Start Block
+          </button>
+          <button id="timer-pause-btn" class="btn btn-warning btn-large hidden">
+            <i class="fa-solid fa-pause"></i> Pause
+          </button>
+          <button id="timer-reset-btn" class="btn btn-danger btn-icon-label" disabled>
+            <i class="fa-solid fa-arrow-rotate-left"></i> Reset
+          </button>
+          <button id="audio-toggle-btn" class="btn btn-secondary btn-icon-only" title="Toggle Ticking Sound">
+            <i class="fa-solid fa-volume-xmark"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- Right Column: Calendar Grid & Daily Goals -->
+      <section class="calendar-section glass-panel">
+        <div class="calendar-card-header">
+          <div class="calendar-title-nav">
+            <button id="prev-month-btn" class="btn btn-icon btn-glass-small"><i class="fa-solid fa-chevron-left"></i></button>
+            <h2 id="calendar-month-year">May 2026</h2>
+            <button id="next-month-btn" class="btn btn-icon btn-glass-small"><i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+          <div class="goal-badges-legend">
+            <span class="legend-item"><span class="legend-dot goal-none"></span> 0</span>
+            <span class="legend-item"><span class="legend-dot goal-partial"></span> 1-2</span>
+            <span class="legend-item"><span class="legend-dot goal-met"><i class="fa-solid fa-check"></i></span> 3 (Target)</span>
+            <span class="legend-item"><span class="legend-dot goal-gold"><i class="fa-solid fa-star"></i></span> 4+</span>
+          </div>
+        </div>
+
+        <!-- Weekdays Header -->
+        <div class="weekdays-grid">
+          <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+        </div>
+
+        <!-- Month Days Grid -->
+        <div id="calendar-days-grid" class="days-grid">
+          <!-- Filled dynamically via app.js -->
+        </div>
+
+        <!-- Quick Log Assist -->
+        <div class="quick-log-card">
+          <div class="quick-log-desc">
+            <i class="fa-solid fa-bolt-lightning text-accent"></i>
+            <span>Log a completed 4-hour block manually if you worked offline.</span>
+          </div>
+          <button id="manual-log-today-btn" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-plus"></i> Add Block Today
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Section: Statistics Dashboard -->
+    <footer class="stats-dashboard glass-panel">
+      <h3>Your Performance Metrics</h3>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon-wrapper blue-glow">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Total Blocks Completed</span>
+            <span id="stat-total-blocks" class="stat-value">0</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrapper orange-glow">
+            <i class="fa-solid fa-fire animate-bounce-slow"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Current Daily Streak</span>
+            <span id="stat-current-streak" class="stat-value">0 Days</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrapper green-glow">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Weekly Completion Rate</span>
+            <span id="stat-weekly-rate" class="stat-value">0 / 21</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrapper gold-glow">
+            <i class="fa-solid fa-trophy"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Perfect Days (3+ blocks)</span>
+            <span id="stat-perfect-days" class="stat-value">0</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Settings Drawer / Modal (Overlay) -->
+  <div id="settings-modal" class="modal-overlay hidden">
+    <div class="modal-container glass-panel animate-scale-up">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-sliders"></i> App Settings</h3>
+        <button id="settings-close-btn" class="btn btn-icon btn-glass-small"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <!-- Google API Settings -->
+        <div class="settings-group">
+          <label class="settings-label">
+            <span>Google API Client ID</span>
+            <span class="help-text">Required for cloud synchronization.</span>
+          </label>
+          <div class="input-with-button">
+            <input type="text" id="google-client-id-input" placeholder="Enter Google Client ID here..." class="form-input">
+            <button id="save-client-id-btn" class="btn btn-secondary">Save</button>
+          </div>
+          <div class="help-instructions">
+            <details>
+              <summary>How to get a Client ID?</summary>
+              <ol>
+                <li>Go to the <a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud Console</a>.</li>
+                <li>Create a project, then go to <strong>APIs & Services > Credentials</strong>.</li>
+                <li>Configure the OAuth consent screen. Add the scope `.../auth/drive.appdata`.</li>
+                <li>Create an <strong>OAuth client ID</strong> (Application type: Web application).</li>
+                <li>Add authorized JavaScript origins: `http://localhost:5173` or `http://127.0.0.1:5173` (depending on your Vite port).</li>
+                <li>Copy the Client ID and paste it here.</li>
+              </ol>
+            </details>
+          </div>
+        </div>
+
+        <!-- Audio Volume -->
+        <div class="settings-group">
+          <label for="tick-volume-slider" class="settings-label">
+            <span>Tick Volume</span>
+            <span id="volume-val-display" class="help-text">30%</span>
+          </label>
+          <input type="range" id="tick-volume-slider" min="0" max="100" value="30" class="range-slider">
+        </div>
+
+        <!-- Debug Controls -->
+        <div class="settings-group debug-group">
+          <label class="settings-label">
+            <span class="text-warning"><i class="fa-solid fa-bug"></i> Developer Debug Tools</span>
+            <span class="help-text">Useful for testing visual rewards and animations.</span>
+          </label>
+          <div class="debug-buttons">
+            <button id="debug-fast-forward-btn" class="btn btn-sm btn-warning-outline">
+              <i class="fa-solid fa-forward"></i> Set to 5s Left
+            </button>
+            <button id="debug-add-past-data-btn" class="btn btn-sm btn-secondary-outline">
+              <i class="fa-solid fa-calendar-plus"></i> Populate Mock History
+            </button>
+            <button id="debug-clear-data-btn" class="btn btn-sm btn-danger-outline">
+              <i class="fa-solid fa-trash"></i> Clear All Data
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day Detail Modal -->
+  <div id="day-modal" class="modal-overlay hidden">
+    <div class="modal-container glass-panel modal-sm animate-scale-up">
+      <div class="modal-header">
+        <h3 id="day-modal-date">May 29, 2026</h3>
+        <button id="day-modal-close-btn" class="btn btn-icon btn-glass-small"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="modal-stats-subtitle">Blocks Completed for this Day</p>
+        <div class="block-counter-control">
+          <button id="day-modal-minus-btn" class="btn btn-icon btn-glass"><i class="fa-solid fa-minus"></i></button>
+          <span id="day-modal-count" class="day-count-display">0</span>
+          <button id="day-modal-plus-btn" class="btn btn-icon btn-glass"><i class="fa-solid fa-plus"></i></button>
+        </div>
+        <div id="day-modal-reward-display" class="day-reward-display">
+          <!-- Icon dynamically rendered (e.g. checkmark or star) -->
+        </div>
+        <div class="modal-footer-buttons">
+          <button id="day-modal-save-btn" class="btn btn-primary btn-full">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="auth.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
